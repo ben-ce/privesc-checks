@@ -27,8 +27,7 @@ tasklist /SVC >> info.out
 net start >> info.out
 
 :: 3rd party driver query
-DRIVERQUERY
-
+DRIVERQUERY >> info.out
 
 :: WMIC enumeration
 for /f "delims=" %%A in ('dir /s /b %WINDIR%\system32\*htable.xsl') do set "var=%%A"
@@ -48,20 +47,20 @@ wmic Timezone get DaylightName,Description,StandardName /format:"%var%" >> out.h
 
 
 :: "AlwaysInstallElevated", if this setting is enabled it allows users of any privilege level to install *.msi files as NT AUTHORITY\SYSTEM
-
+echo "Registry query..." >> registry.out
 reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated >> registry.out
 reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated >> registry.out
 
 :: keyword search
-dir /s *pass* == *cred* == *vnc* == *.config*
-findstr /si password *.xml *.ini *.txt
-reg query HKLM /f password /t REG_SZ /s
-reg query HKCU /f password /t REG_SZ /s
+dir /s *pass* == *cred* == *vnc* == *.config* >> credentials.out
+findstr /si password *.xml *.ini *.txt >> credentials.out
+reg query HKLM /f password /t REG_SZ /s >> credentials.out
+reg query HKCU /f password /t REG_SZ /s >> credentials.out
 
 :: Windows service manager operations
-sc qc Spooler
+sc qc Spooler >> svc.out
 
-:: List all service privilege requirements
+:: List all service privilege requirements with SysInternalsSuite accesschk.exe
 accesschk.exe /accepteula
 accesschk.exe -ucqv *
 
